@@ -17,10 +17,8 @@ const SettingsPage = (props: SettingsPageProps) => {
         selectedValue={level}
         style={{height: 50, width: 150}}
         onValueChange={(l: ItemValue) => setLevel(l as EnglishLevel)}>
-        <Picker.Item
-          label="Elementary"
-          value={EnglishLevel.ELEMENTARY}
-        />
+        <Picker.Item label="Elementary" value={EnglishLevel.ELEMENTARY}/>
+        <Picker.Item label="Intermediate" value={EnglishLevel.INTERMEDIATE}/>
         <Picker.Item label="Advanced" value={EnglishLevel.ADVANCED}/>
       </Picker>
       <Button
@@ -42,6 +40,7 @@ export interface Settings {
 
 export enum EnglishLevel {
   ELEMENTARY,
+  INTERMEDIATE,
   ADVANCED,
 }
 

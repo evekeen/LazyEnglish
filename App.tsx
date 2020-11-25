@@ -24,7 +24,7 @@ const App = () => {
   );
 };
 
-const SettingsScreen = (props: { navigation: any }) => {
+const SettingsScreen = (props: {navigation: any}) => {
   const [settings, setSettings] = useState<Settings>({
     level: EnglishLevel.ELEMENTARY,
   });
@@ -39,8 +39,8 @@ const SettingsScreen = (props: { navigation: any }) => {
   );
 };
 
-const BrowserScreen = (props: { settings: Settings }) => {
-  return <Browser settings={props.settings}/>;
+const BrowserScreen = (props: {route: any, navigation: any}) => {
+  return <Browser settings={props.route.params.settings}/>;
 };
 StyleSheet.create({
   scrollView: {

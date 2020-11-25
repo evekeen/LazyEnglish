@@ -1,9 +1,22 @@
-const WORD_COUNT_THRESHOLD = 0.3;
-const MAX_WORDS = 5;
+import {EnglishLevel} from './SettingsPage';
+
+const MAX_WORDS = 50;
 const MIN_WORD_LENGTH = 4;
 const RU_REGEXP = /^[A-Яа-я]*$/;
 
-export function getTokens(text: string): string[] {
+function getLimit(level: EnglishLevel): number {
+  switch (level) {
+    case EnglishLevel.ELEMENTARY:
+      return 0.1;
+    case EnglishLevel.INTERMEDIATE:
+      return 0.3;
+    default:
+      return 0.5;
+  }
+}
+
+export function getTokens(text: string, level: EnglishLevel): string[] {
+  console.log('getting tokens...');
   const words = text.split(/\s+/);
   const index: {[key: string]: number} = {};
   words
@@ -16,6 +29,6 @@ export function getTokens(text: string): string[] {
   const filtered = Object.keys(index);
   const total = filtered.length;
   filtered.sort((a, b) => index[b] - index[a]);
-  const wordsToTake = Math.min(total * WORD_COUNT_THRESHOLD, MAX_WORDS);
+  const wordsToTake = Math.min(total * getLimit(level), MAX_WORDS);
   return filtered.slice(0, wordsToTake);
 }
