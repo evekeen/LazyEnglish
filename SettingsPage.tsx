@@ -2,6 +2,7 @@ import {
   Button,
   StyleSheet,
   Text,
+  View,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import React, {useState} from 'react';
@@ -11,21 +12,24 @@ import {ItemValue} from '@react-native-picker/picker/typings/Picker';
 const SettingsPage = (props: SettingsPageProps) => {
   const [level, setLevel] = useState<EnglishLevel>(props.settings.level);
   return (
-    <>
-      <Text style={styles.sectionTitle}>English Level</Text>
-      <Picker
-        selectedValue={level}
-        style={{height: 50, width: 150}}
-        onValueChange={(l: ItemValue) => setLevel(l as EnglishLevel)}>
-        <Picker.Item label="Elementary" value={EnglishLevel.ELEMENTARY}/>
-        <Picker.Item label="Intermediate" value={EnglishLevel.INTERMEDIATE}/>
-        <Picker.Item label="Advanced" value={EnglishLevel.ADVANCED}/>
-      </Picker>
-      <Button
-        title="Apply"
-        onPress={() => props.setSettings({level: level})}
-      />
-    </>
+    <View>
+      <View>
+        <Text style={styles.input}>English Level</Text>
+        <Picker
+          selectedValue={level}
+          onValueChange={(l: ItemValue) => setLevel(l as EnglishLevel)}>
+          <Picker.Item label="Elementary" value={EnglishLevel.ELEMENTARY}/>
+          <Picker.Item label="Intermediate" value={EnglishLevel.INTERMEDIATE}/>
+          <Picker.Item label="Advanced" value={EnglishLevel.ADVANCED}/>
+        </Picker>
+      </View>
+      <View>
+        <Button
+          title="Ok"
+          onPress={() => props.setSettings({level: level})}
+        />
+      </View>
+    </View>
   );
 };
 
@@ -63,6 +67,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: Colors.black,
+  },
+  input: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   sectionDescription: {
     marginTop: 8,

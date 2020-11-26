@@ -1,45 +1,48 @@
-import React, {useState} from 'react';
+import React from 'react';
 import 'react-native-gesture-handler';
-import {StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import SettingsPage, {EnglishLevel, Settings} from './SettingsPage';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Browser} from './Browser';
 
-const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const defaultSettings: Settings = {
+  level: EnglishLevel.ELEMENTARY
+};
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
+      <Tab.Navigator>
+        <Tab.Screen
           name="Settings"
           component={SettingsScreen}
           options={{title: 'Settings'}}
+          initialParams={{settings: defaultSettings}}
         />
-        <Stack.Screen name="Browser" component={BrowserScreen}/>
-      </Stack.Navigator>
+        <Tab.Screen key='Browser' name="Browser" component={BrowserScreen} initialParams={{settings: defaultSettings}}/>
+      </Tab.Navigator>
     </NavigationContainer>
   );
 };
 
-const SettingsScreen = (props: {navigation: any}) => {
-  const [settings, setSettings] = useState<Settings>({
-    level: EnglishLevel.ELEMENTARY,
-  });
+const SettingsScreen = (props: { navigation: any, route: any}) => {
   return (
-    <SettingsPage
-      settings={settings}
-      setSettings={(settings) => {
-        setSettings(settings);
-        props.navigation.navigate('Browser', {settings});
-      }}
-    />
+    <SafeAreaView>
+      <SettingsPage
+        settings={props.route.params.settings}
+        setSettings={(settings) => {
+          props.navigation.navigate('Browser', {settings});
+        }}
+      />
+    </SafeAreaView>
   );
 };
 
-const BrowserScreen = (props: {route: any; navigation: any}) => {
+const BrowserScreen = (props: { route: any; navigation: any }) => {
   return <Browser settings={props.route.params.settings}/>;
 };
 StyleSheet.create({
