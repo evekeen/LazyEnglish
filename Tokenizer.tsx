@@ -1,6 +1,6 @@
 import {EnglishLevel} from './SettingsPage';
 
-const MAX_WORDS = 50;
+const MAX_WORDS = 500;
 const MIN_WORD_LENGTH = 5;
 const RU_REGEXP = /^[аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ]+$/;
 
