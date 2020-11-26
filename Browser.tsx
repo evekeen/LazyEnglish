@@ -12,14 +12,17 @@ export const Browser = (props: BrowserProps) => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
+  const [scheduled] = useState<BooleanWrapper>(new BooleanWrapper(false));
 
   function onMessage(event: WebViewMessageEvent): void {
     const message = JSON.parse(event.nativeEvent.data);
+    console.log(message.type);
     switch (message.type) {
       case 'content':
         const tokens = getTokens(message.payload, props.settings.level);
         if (tokens.length > 0) {
           setLoading(true);
+          console.log('Translating...');
           translate(tokens)
             .then((translation) => {
               webView.current?.postMessage(
@@ -35,15 +38,13 @@ export const Browser = (props: BrowserProps) => {
         }
         break;
       case 'ready':
-        console.log('ready');
         setReady(true);
+        setLoading(false);
         break;
       case 'translated':
-        console.log('translated');
         setLoading(false);
         break;
       case 'no-post':
-        console.log('no post found');
         setLoading(false);
         break;
       case 'error':
@@ -64,22 +65,35 @@ export const Browser = (props: BrowserProps) => {
     <View style={{flex: 1}}>
       <WebView
         style={{flex: 1}}
-        source={{uri: 'https://habr.com/ru'}}
+        source={{uri: 'https://m.habr.com/ru/all/'}}
         injectedJavaScript={replacer}
         ref={webView}
         onMessage={onMessage}
         onError={(error) => console.log(error)}
-        onLoadStart={() => setLoading(true)}
-        javaScriptEnabled={true}
-        onNavigationStateChange={(nav) => {
-          if (nav.loading) {
-            setLoading(true);
-          } else if (ready) {
-            setTimeout(() => {
-              webView.current?.postMessage(JSON.stringify({type: 'getContent'}));
-            }, 1000);
-          }
+        onLoadStart={() => {
+          console.log('>> onLoadStart');
+          setLoading(true);
         }}
+        onLoad={() => {
+          console.log('>> onLoad');
+          setLoading(true);
+          if (scheduled.value) {
+            console.log('already scheduled');
+            return;
+          }
+          scheduled.value = true;
+          console.log('scheduling...');
+          setTimeout(() => {
+            if (scheduled.value) {
+              console.log('executing!');
+              scheduled.value = false;
+              webView.current?.postMessage(JSON.stringify({type: 'getContent'}));
+            } else {
+              console.log('not scheduled');
+            }
+          }, 2000);
+        }}
+        javaScriptEnabled={true}
       />
       {loading && <Overlay/>}
     </View>
@@ -89,11 +103,15 @@ export const Browser = (props: BrowserProps) => {
 const Overlay = () => {
   return (
     <View style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, backgroundColor: '#000'}}>
-      <ActivityIndicator size="large"  style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0}}/>
+      <ActivityIndicator size="large" style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0}}/>
     </View>
   );
 }
 
 interface BrowserProps {
   settings: Settings;
+}
+
+class BooleanWrapper {
+  constructor(public value: boolean) {}
 }

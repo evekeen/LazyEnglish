@@ -1,21 +1,26 @@
 const replacer = `
-const MAX_ATTEMPTS = 5;
-const TIMEOUT = 200;
+const MAX_ATTEMPTS = 10;
+const TIMEOUT = 500;
 
-function replaceAfterFirstAppearance(text, original, replacement) {
-  const firstStart = text.indexOf(original);
-  const firstEnd = firstStart + original.length;
-  const before = text.substring(0, firstEnd);
-  const after = text.substring(firstEnd);
-  return before + after.replaceAll(original, replacement);
+function replaceAfterFirstAppearance(text, lowerCase, original, replacement) {
+  const regexp = new RegExp('([ .,!?;:-]+)' + original + '([ .,!?;:-]+)', 'ig');
+  const substitution = '$1' + replacement + '$2';
+  try {
+    const firstStart = lowerCase.indexOf(original);
+    const firstEnd = firstStart + original.length;
+    const before = text.substring(0, firstEnd);
+    const after = text.substring(firstEnd);
+    const beforeLC = lowerCase.substring(0, firstEnd);
+    const afterLC = lowerCase.substring(firstEnd);    
+    const newText = before + after.replace(regexp, '$1' + replacement + '$2');
+    const newLC = beforeLC + afterLC.replace(regexp, '$1' + replacement + '$2');
+    return [newText, newLC];
+  } catch (err) {
+    alert('Failed to substitute translation ' + regexp + ' - ' + JSON.stringify(err));
+  }
 }
 
 function handleMessage(message, attempt) {
- if (!document.innerText && attempt < MAX_ATTEMPTS) {
-    setTimeout(() => handleMessage(message, attempt + 1), TIMEOUT);
-    return;
-  }
-  
   const postBody = document.getElementById('post-content-body');
   if (!postBody) {
     window.ReactNativeWebView.postMessage(JSON.stringify({type: 'no-post'}));
@@ -33,8 +38,9 @@ function handleMessage(message, attempt) {
         const {tokens, translation} = message.payload;
         const translationsHtml = translation.map((t) => '<b style="color: #19267e;">' + t + '</b>');
         let html = postBody.innerHTML;
+        let lowerCase = html.toLowerCase('ru'); 
         for (let i = 0; i < tokens.length; i++) {
-          html = replaceAfterFirstAppearance(html, tokens[i], translationsHtml[i]);
+          [html, lowerCase] = replaceAfterFirstAppearance(html, lowerCase, tokens[i], translationsHtml[i]);
         }
         postBody.innerHTML = html
         window.ReactNativeWebView.postMessage(JSON.stringify({type: 'translated'}));
@@ -46,6 +52,8 @@ function handleMessage(message, attempt) {
     window.ReactNativeWebView.postMessage(JSON.stringify({type: 'error', payload: JSON.stringify(err)}));
   }
 }
+
+window.ReactNativeWebView.postMessage(JSON.stringify({type: 'injected'}));
 
 let ready = false;
 window.addEventListener('load', () => {

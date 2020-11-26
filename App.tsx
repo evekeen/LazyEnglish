@@ -39,7 +39,7 @@ const SettingsScreen = (props: {navigation: any}) => {
   );
 };
 
-const BrowserScreen = (props: {route: any, navigation: any}) => {
+const BrowserScreen = (props: {route: any; navigation: any}) => {
   return <Browser settings={props.route.params.settings}/>;
 };
 StyleSheet.create({
