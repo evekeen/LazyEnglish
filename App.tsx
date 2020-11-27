@@ -16,7 +16,16 @@ const defaultSettings: Settings = {
 const App = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+      <Tab.Navigator
+        tabBarOptions={{
+          labelStyle: {
+            fontSize: 16,
+          },
+          tabStyle: {
+            justifyContent: 'center',
+            backgroundColor: '#fef',
+          },
+        }}>
         <Tab.Screen
           name="Settings"
           component={SettingsScreen}
