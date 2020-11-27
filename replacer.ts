@@ -2,6 +2,8 @@ const replacer = `
 const MAX_ATTEMPTS = 10;
 const TIMEOUT = 500;
 
+console.log('injecting js...');
+
 function replaceAfterFirstAppearance(text, lowerCase, original, replacement) {
   const regexp = new RegExp('([ .,!?;:-]+)' + original + '([ .,!?;:-]+)', 'ig');
   const substitution = '$1' + replacement + '$2';
@@ -21,8 +23,10 @@ function replaceAfterFirstAppearance(text, lowerCase, original, replacement) {
 }
 
 function handleMessage(message, attempt) {
+  console.log('message');
   const postBody = document.getElementById('post-content-body');
-  if (!postBody) {
+  if (!postBody || !postBody.innerText) {
+    console.log('no-post');
     window.ReactNativeWebView.postMessage(JSON.stringify({type: 'no-post'}));
     return;
   }
@@ -30,11 +34,13 @@ function handleMessage(message, attempt) {
   try {
     switch (message.type) {
       case 'getContent': {
-        const payload = postBody.innerText;        
+        console.log('getContent');
+        const payload = postBody.innerText;      
         window.ReactNativeWebView.postMessage(JSON.stringify({type: 'content', payload: payload}));
         break;
       }
-      case 'replaceWords': {        
+      case 'replaceWords': {
+        console.log('replaceWords');        
         const {tokens, translation} = message.payload;
         const translationsHtml = translation.map((t) => '<b style="color: #19267e;">' + t + '</b>');
         let html = postBody.innerHTML;
@@ -48,9 +54,25 @@ function handleMessage(message, attempt) {
       }
     }
   } catch(err) {
+    alert('error', err);
     alert('error: ' + (JSON.stringify(err) || err));
     window.ReactNativeWebView.postMessage(JSON.stringify({type: 'error', payload: JSON.stringify(err)}));
   }
+}
+
+function onMessage(event) {
+  if (!ready) return;  
+      
+  let message = undefined;
+  try {
+    message = JSON.parse(event.data);
+  } catch (err) {
+    // ignore other messages
+    console.log('cannot parse ' + event.data);
+    return;
+  }
+  
+  handleMessage(message, 1);
 }
 
 window.ReactNativeWebView.postMessage(JSON.stringify({type: 'injected'}));
@@ -61,19 +83,8 @@ window.addEventListener('load', () => {
   window.ReactNativeWebView.postMessage(JSON.stringify({type: 'ready'}));
 });
 
-window.addEventListener("message", function (event) {
-  if (!ready) return;  
-      
-  let message = undefined;
-  try {
-    message = JSON.parse(event.data);
-  } catch (err) {
-    // ignore other messages
-    return;
-  }
-  
-  handleMessage(message, 1);
-});
+document.addEventListener("message", onMessage);
+window.addEventListener("message", onMessage);
 true;
 `;
 

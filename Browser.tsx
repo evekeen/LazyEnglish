@@ -17,9 +17,7 @@ export const Browser = (props: BrowserProps) => {
   console.log('Browser', props, props.settings.level, translated);
   useEffect(() => {
     console.log('effect', props.settings.level, translated);
-    if (translated) {
-      webView.current?.reload();
-    }
+    webView.current?.reload();
   }, [props.settings.level]);
 
   function onMessage(event: WebViewMessageEvent): void {
@@ -119,8 +117,8 @@ export const Browser = (props: BrowserProps) => {
 
 const Overlay = () => {
   return (
-    <View style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, backgroundColor: '#000'}}>
-      <ActivityIndicator size="large" style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0}}/>
+    <View style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, backgroundColor: '#fff'}}>
+      <ActivityIndicator size="large" color='#30f' style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: 0}}/>
     </View>
   );
 };
