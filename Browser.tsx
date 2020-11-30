@@ -11,12 +11,10 @@ export const Browser = (props: BrowserProps) => {
   const webView = useRef<WebView>(null);
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const [ready, setReady] = useState<boolean>(false);
   const [scheduled] = useState<BooleanWrapper>(new BooleanWrapper(false));
-  const [translated, setTranslated] = useState<boolean>(false);
-  console.log('Browser', props, props.settings.level, translated);
+  console.log('Browser', props, props.settings.level);
   useEffect(() => {
-    console.log('effect', props.settings.level, translated);
+    console.log('effect', props.settings.level);
     webView.current?.reload();
   }, [props.settings.level]);
 
@@ -25,7 +23,6 @@ export const Browser = (props: BrowserProps) => {
     console.log(message.type);
     switch (message.type) {
       case 'content':
-        setTranslated(false);
         const tokens = getTokens(message.payload, props.settings.level);
         if (tokens.length > 0) {
           setLoading(true);
@@ -44,22 +41,14 @@ export const Browser = (props: BrowserProps) => {
             });
         }
         break;
-      case 'ready':
-        setReady(true);
-        setLoading(false);
-        setTranslated(false);
-        break;
       case 'translated':
         setLoading(false);
-        setTranslated(true);
         break;
       case 'no-post':
         setLoading(false);
-        setTranslated(false);
         break;
       case 'error':
         setError(message.payload);
-        setTranslated(false);
         break;
     }
   }
